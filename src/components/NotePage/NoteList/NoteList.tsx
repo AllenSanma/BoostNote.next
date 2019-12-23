@@ -13,6 +13,10 @@ import {
   iconColor
 } from '../../../lib/styled/styleFunctions'
 import { IconEdit, IconLoupe } from '../../icons'
+import {
+  useGlobalKeyDownHandler,
+  isWithGeneralCtrlKey
+} from '../../../lib/keyboard'
 
 export const StyledNoteListContainer = styled.div`
   display: flex;
@@ -115,6 +119,18 @@ const NoteList = ({
   )
 
   const listRef = useRef<HTMLUListElement>(null)
+  const searchRef = useRef<HTMLInputElement>(null)
+
+  useGlobalKeyDownHandler(e => {
+    switch (e.key) {
+      case 'p':
+        if (isWithGeneralCtrlKey(e)) {
+          e.preventDefault()
+          e.stopPropagation()
+          searchRef.current!.focus()
+        }
+    }
+  })
 
   const focusList = useCallback(() => {
     listRef.current!.focus()
@@ -124,6 +140,7 @@ const NoteList = ({
       <div className='control'>
         <div className='searchInput'>
           <input
+            ref={searchRef}
             className='input'
             value={search}
             onChange={updateSearchInput}
