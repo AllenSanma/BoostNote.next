@@ -1,9 +1,4 @@
-import React, {
-  useCallback,
-  KeyboardEvent,
-  useRef,
-  ChangeEventHandler
-} from 'react'
+import React, { useCallback, useRef, ChangeEventHandler } from 'react'
 import NoteItem from './NoteItem'
 import { NoteDoc } from '../../../lib/db/types'
 import styled from '../../../lib/styled'
@@ -13,10 +8,7 @@ import {
   iconColor
 } from '../../../lib/styled/styleFunctions'
 import { IconEdit, IconLoupe } from '../../icons'
-import {
-  useGlobalKeyDownHandler,
-  isWithGeneralCtrlKey
-} from '../../../lib/keyboard'
+import { useGlobalKeyDownHandler } from '../../../lib/keyboard'
 
 export const StyledNoteListContainer = styled.div`
   display: flex;
@@ -104,33 +96,22 @@ const NoteList = ({
     [setSearchInput]
   )
 
-  const handleListKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      switch (event.key) {
-        case 'ArrowDown':
+  useGlobalKeyDownHandler(event => {
+    switch (event.key) {
+      case 'ArrowDown':
+        if (event.altKey) {
           navigateDown()
-          break
-        case 'ArrowUp':
-          navigateUp()
-          break
-      }
-    },
-    [navigateUp, navigateDown]
-  )
-
-  const listRef = useRef<HTMLUListElement>(null)
-  const searchRef = useRef<HTMLInputElement>(null)
-
-  useGlobalKeyDownHandler(e => {
-    switch (e.key) {
-      case 'p':
-        if (isWithGeneralCtrlKey(e)) {
-          e.preventDefault()
-          e.stopPropagation()
-          searchRef.current!.focus()
         }
+        break
+      case 'ArrowUp':
+        if (event.altKey) {
+          navigateUp()
+        }
+        break
     }
   })
+
+  const listRef = useRef<HTMLUListElement>(null)
 
   const focusList = useCallback(() => {
     listRef.current!.focus()
@@ -140,7 +121,6 @@ const NoteList = ({
       <div className='control'>
         <div className='searchInput'>
           <input
-            ref={searchRef}
             className='input'
             value={search}
             onChange={updateSearchInput}
@@ -152,7 +132,7 @@ const NoteList = ({
           <IconEdit size='0.8em' />
         </button>
       </div>
-      <ul tabIndex={0} onKeyDown={handleListKeyDown} ref={listRef}>
+      <ul tabIndex={0} ref={listRef}>
         {notes.map((note, index) => {
           const noteIsCurrentNote = index === currentNoteIndex
           return (
